@@ -1,15 +1,13 @@
 # coding: utf-8
 
-import ui
-import os
-import console
+import console,os,ui
 
 class MyTableViewDataSource (object):
    # sel = [None]
     
     def __init__(self,setter, base_dir = '.'):
         self.dir = base_dir
-        self.setter=setter
+        self.setter = setter
         _, folders, files = next(os.walk(base_dir))
         folders.insert(0,'..')
         self.data = (folders,files)
@@ -21,7 +19,6 @@ class MyTableViewDataSource (object):
         return len(self.data[section])
 
     def tableview_cell_for_row(self, tableview, section, row):
-
         cell = ui.TableViewCell()
         cell.accessory_type = ('disclosure_indicator', 'detail_button')[section]
         cell.text_label.text = self.data[section][row]
@@ -35,7 +32,7 @@ class MyTableViewDataSource (object):
         if section == 0:
             dir = os.path.join(self.dir, self.data[section][row])
             if os.path.exists(dir):
-                self.dir=dir
+                self.dir = dir
             newv = FileViewer(self.setter,self.dir)
             nav = tableview.superview.navigation_view
             nav.push_view(newv)
@@ -50,19 +47,16 @@ class MyTableViewDataSource (object):
         stats =  os.stat(full)
         console.hud_alert('Size: {0} KB'.format(stats.st_size//1024))
 
-
 class FileViewer(ui.View):
     def __init__(self,setter, base_dir = '.', *args, **kargs):
-        self.table = ui.TableView(*args, **kargs)
-        self.table.name = 'FileTable'
+        table = ui.TableView(*args, **kargs)
+        table.name = 'FileTable'
         self.src = MyTableViewDataSource(setter, base_dir)
-        self.table.data_source = self.src
-        self.table.delegate = self.src
-        self.table.flex = 'WHTBLR'
-
+        table.data_source = table.delegate = self.src
+        table.flex = 'WHTBLR'
         #self.view = ui.View(name = base_dir)
         self.background_color = 'white'
-        self.add_subview(self.table)
+        self.add_subview(table)
 
     @property
     def selection(self):
@@ -76,3 +70,5 @@ def getFile(setter):
     ui.in_background(nv.wait_modal)
     nv.wait_modal()
    # return fv.selection
+
+import ed  # if this script in run then launch the editor
